@@ -14,3 +14,66 @@
 </p>
 
 # Validate
+
+Simple JSON validation for Vapor 2.0
+
+**Please note this package is designed for the now outdated Vapor 2.0.
+Newer and better options for valiating json are available with Vapor 3.0**
+
+## Getting Started
+
+```swift
+import Validate
+```
+
+## Validating API models
+
+```swift
+enum UserType: String, CaseIterable {
+    case normal, admin
+}
+struct CreateUserReqest: Validatable {
+    let json: JSON
+
+    let email: String
+    let password: String
+    let userType: String
+    let rememberMe: Bool?
+
+    init(json: JSON) throws {
+        self.json = json
+
+        self.email = try email(key: "username")
+        self.password = try string(key: "password")
+        self.userType = try enum(oneOf: UserType.self, key: "user_type")
+        self.rememberMe = optionalBool(key: "remember_me")
+    }
+}
+```
+
+## Using Enums for Keys
+
+```swift
+extension User {
+    enum Keys: String, KeyRepresentable {
+        case email, password
+        case rememberMe = "remember_me"
+    }
+}
+
+struct UserLogInRequest: Validatable {
+    let json: JSON
+
+    let email: String
+    let password: String
+    let rememberMe: Bool?
+
+    init(json: JSON) throws {
+        self.json = json
+
+        self.email = try email(key: User.Keys.email)
+        self.password = try string(key: User.Keys.password)
+        self.rememberMe = try optionalBool(key: User.Keys.rememberMe)
+    }
+}
+```

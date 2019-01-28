@@ -1,25 +1,26 @@
 version: 2
 
-linux:
-  docker:
-    - image: swift:4.2
-  steps:
-    - checkout
-    - run:
-        name: Compile code
-        command: swift build
-    - run:
-        name: Run unit tests
-        command: swift test
+jobs:
+  linux:
+    docker:
+      - image: swift:4.2
+    steps:
+      - checkout
+      - run:
+          name: Compile code
+          command: swift build
+      - run:
+          name: Run unit tests
+          command: swift test
 
-linux-release:
-  docker:
-    - image: swift:4.2
-  steps:
-    - checkout
-    - run:
-        name: Compile code with optimizations
-        command: swift build -c release
+  linux-release:
+    docker:
+      - image: swift:4.2
+    steps:
+      - checkout
+      - run:
+          name: Compile code with optimizations
+          command: swift build -c release
 
 workflows:
   version: 2
@@ -28,13 +29,13 @@ workflows:
       - linux
       - linux-release
 
-nightly:
-  triggers:
-    - schedule:
-        cron: '0 0 * * *'
-        filters:
-          branches:
-            only:
-              - master
-  jobs:
-    - linux
+  nightly:
+    triggers:
+      - schedule:
+          cron: '0 0 * * *'
+          filters:
+            branches:
+              only:
+                - master
+    jobs:
+      - linux

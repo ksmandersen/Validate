@@ -21,6 +21,34 @@ extension Validate {
     public static func string<K: KeyRepresentable>(json: JSON, key: K) throws -> String {
         return try string(json: json, key: key.rawValue)
     }
+    
+    public static func length(json: JSON, min: Int?, max: Int?, key: String) throws -> String? {
+        guard let value = optionalString(json: json, key: key) else { return nil }
+        if let min = min, value.count < min {
+            throw ValidationError.invalidLength(key: key, min: min, max: max)
+        }
+        
+        if let max = max, value.count > max {
+            throw ValidationError.invalidLength(key: key, min: min, max: max)
+        }
+        
+        return value
+    }
+    
+    public static func length<K: KeyRepresentable>(json: JSON, min: Int?,
+                                                   max: Int, key: K) throws -> String? {
+        return try length(json: json, min: min, max: max, key: key.rawValue)
+    }
+    
+    public static func length(json: JSON, min: Int?, max: Int?, key: String) throws -> String {
+        let _ = try string(json: json, key: key)
+        return try length(json: json, min: min, max: max, key: key)
+    }
+    
+    public static func length<K: KeyRepresentable>(json: JSON, min: Int?,
+                                                   max: Int, key: K) throws -> String {
+        return try length(json: json, min: min, max: max, key: key.rawValue)
+    }
 }
 
 extension Validatable {

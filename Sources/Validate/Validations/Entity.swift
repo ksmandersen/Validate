@@ -28,6 +28,40 @@ extension Validate {
     public static func entity<E: Entity, K: KeyRepresentable>(json: JSON, key: K) throws -> E {
         return try entity(json: json, key: key.rawValue)
     }
+    
+    public static func optionalUniqueEntity<E: Entity>(json: JSON, key: String,
+                                                      allowingId: Identifier? = nil) throws -> E? {
+        guard let entity: E = try optionalEntity(json: json, key: key) else {
+            return nil
+        }
+        
+        if let allowingId = allowingId, entity.id == allowingId {
+            return entity
+        }
+        
+        throw ValidationError.custom(key: key, reason: "Enitity already exists for \(key)",
+                                     identifier: "enitity_not_unique")
+    }
+    
+    public static func optionalUniqueEntity<E: Entity, K: KeyRepresentable>(json: JSON, key: K,
+                                               allowingId: Identifier? = nil) throws -> E? {
+        return try optionalUniqueEntity(json: json, key: key.rawValue, allowingId: allowingId)
+    }
+    
+    public static func uniqueEntity<E: Entity>(json: JSON, key: String,
+                                               allowingId: Identifier? = nil) throws -> E {
+        guard let entity: E = try optionalUniqueEntity(json: json, key: key,
+                                                   allowingId: allowingId) else {
+            throw ValidationError.missingValue(key: key)
+        }
+        
+        return entity
+    }
+    
+    public static func uniqueEntity<E: Entity, K: KeyRepresentable>(json: JSON, key: K,
+                                               allowingId: Identifier? = nil) throws -> E {
+        return try uniqueEntity(json: json, key: key.rawValue, allowingId: allowingId)
+    }
 }
 
 extension Validatable {
@@ -45,5 +79,21 @@ extension Validatable {
     
     public func entity<E: Entity, K: KeyRepresentable>(key: K) throws -> E {
         return try Validate.entity(json: json, key: key)
+    }
+    
+    public func optionalUniqueEntity<E: Entity>(key: String) throws -> E? {
+        return try Validate.optionalUniqueEntity(json: json, key: key)
+    }
+    
+    public func optionalUniqueEntity<E: Entity, K: KeyRepresentable>(key: K) throws -> E? {
+        return try Validate.optionalUniqueEntity(json: json, key: key)
+    }
+    
+    public func uniqueEntity<E: Entity>(key: String) throws -> E {
+        return try Validate.uniqueEntity(json: json, key: key)
+    }
+    
+    public func uniqueEntity<E: Entity, K: KeyRepresentable>(key: K) throws -> E {
+        return try Validate.uniqueEntity(json: json, key: key)
     }
 }

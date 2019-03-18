@@ -17,7 +17,7 @@ extension Validate {
         return try optionalEntity(json: json, key: key.rawValue)
     }
     
-    public static func entity<E: Entity>(json: JSON, key: String) throws -> E? {
+    public static func entity<E: Entity>(json: JSON, key: String) throws -> E {
         guard let entity: E = try optionalEntity(json: json, key: key) else {
             throw ValidationError.missingValue(key: key)
         }
@@ -25,7 +25,7 @@ extension Validate {
         return entity
     }
     
-    public static func entity<E: Entity, K: KeyRepresentable>(json: JSON, key: K) throws -> E? {
+    public static func entity<E: Entity, K: KeyRepresentable>(json: JSON, key: K) throws -> E {
         return try entity(json: json, key: key.rawValue)
     }
 }
@@ -39,11 +39,11 @@ extension Validatable {
         return try Validate.optionalEntity(json: json, key: key)
     }
     
-    public func entity<E: Entity>(key: String) throws -> E? {
+    public func entity<E: Entity>(key: String) throws -> E {
         return try Validate.entity(json: json, key: key)
     }
     
-    public func entity<E: Entity, K: KeyRepresentable>(key: K) throws -> E? {
+    public func entity<E: Entity, K: KeyRepresentable>(key: K) throws -> E {
         return try Validate.entity(json: json, key: key)
     }
 }
